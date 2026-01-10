@@ -9,6 +9,7 @@ A rewrite/reimagining of Hydrogen
 ## Building
 Once the build system has fully come in:
 ```bash
+cmake .
 make
 sudo checkinstall
 #make clean
