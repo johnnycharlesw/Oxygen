@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <cassert>
 #include <sstream>
 
@@ -9,60 +8,11 @@
 class Generator
 {
 	public:
-		explicit Generator(NodeProg prog) : m_prog(std::move(prog))
-		{
+		explicit Generator(NodeProg prog);
 
-		}
+		void gen_term(const NodeTerm* term);
 
-		void gen_term(const NodeTerm* term)
-		{
-			struct TermVisitor
-			{
-				Generator& generator;
-
-				void operator()(const NodeTermInt* term)
-				{
-					//TODO ask Soviet to do this part
-				}
-
-				void operator()(const NodeTermFloat* term)
-				{
-
-				}
-
-				void operator()(const NodeTermBool* term)
-				{
-
-				}
-
-				void operator()(const NodeTermString* term)
-				{
-
-				}
-				void
-			};
-		}
-
-		void gen_bin_expr(const NodeBinExpr* bin_expr)
-		{
-			struct ExprVisitor
-			{
-				Generator& generator;
-
-				void operator()(const NodeBinOperSub sub_expr)
-				{
-					//TODO add this
-				}
-
-				void operator()(const NodeBinExpr* bin_expr)
-				{
-					//TODO add this
-				}
-			};
-
-			ExprVisitor visitor {.generator = *this};
-			std::visit(visitor, bin_expr ->_op);
-		}
+		void gen_bin_expr(const NodeBinExpr* bin_expr);
 
 		void gen_method(const std::string&, const NodeLabelStmt* label_expr)
 		{
@@ -77,129 +27,23 @@ class Generator
 			};
 		}
 
-		[[nodiscard]] std::string gen_prog()
-		{
-			m_output << "section .bss\n";
-			m_output << "    input_buffer: resb 128";
-			m_output << "\n";
-			m_output << "section .text\n";
-			m_output << "    global _start\n";
-			m_output << "_start:\n";
-			for (const NodeStmt* stmt : m_prog.stmts)
-			{
-				gen_stmt(stmt);
-			}
-
-		}
+		[[nodiscard]] std::string gen_prog();
 
 	private:
+    void gen_stmt(const NodeStmt *stmt);
+
 		// I don't know how to do assembly so could one of you help me with this part?
-		void push(const std::string& reg)
-		{
-			m_output << "    push " << reg << "\n";
-			m_stack_size++;
-		}
+		void push(const std::string& reg);
 
-		void pop(const std::string& reg)
-		{
-			m_output << "    pop " << reg << "\n";
-			m_stack_size--;
-		}
+		void pop(const std::string& reg);
 
-		void begin_scope()
-		{
-			m_scopes.push_back(m_vars.size());
-		}
+		void begin_scope();
 
-		void end_scope()
-		{
-			const size_t pop_count = m_vars.size() - m_scopes.back();
-			if (pop_count != 0) {
-				m_output << "    add rsp, " << pop_count * 8 << "\n";
-			}
-			m_stack_size -= pop_count;
-			for (size_t i = 0; i < pop_count; i++) {
-				m_vars.pop_back();
-			}
-			m_scopes.pop_back();
-		}
+		void end_scope();
 
-		std::stringstream ArgtoAsm(const int argType = 0, const std::variant<std::string, std::optional<std::string>, int> &label = std::nullopt)
-		{
+		std::stringstream ArgtoAsm(const int argType = 0, const std::variant<std::string, std::optional<std::string>, int> &label = std::nullopt);
 
-			// Write
-			if (argType == 0)
-			{
-				std::string temp;
-
-				if (std::holds_alternative<std::string>(label))
-				{
-					if (temp = std::get<std::string>(label); temp.empty())
-					{
-						std::cerr << "[Argument error] message has no value";
-						exit(EXIT_FAILURE);
-					}
-				}
-				if (std::holds_alternative<int>(label))
-				{
-					std::cerr << "[Input error] message can not be an integer!";
-					exit(EXIT_FAILURE);
-				}
-				m_output << "   mov rax, 1\n";
-				m_output << "   mov rdi, 1\n";
-				m_output << "   mov rsi, " << temp << "\n";
-				m_output << "   mov rdx, " << temp.length() << "\n";
-				m_output << "   syscall\n";
-
-				return std::move(m_output);
-			}
-			// Read
-			if (argType == 1)
-			{
-				m_output << "   mov rax, 0\n";
-				m_output << "   mov rdi, 1\n";
-				m_output << "   mov rsi, [rel input_buffer]\n";
-				m_output << "   mov rdx, 128\n";
-				m_output << "   syscall\n";
-				return std::move(m_output);
-			}
-			// exit/ return
-			if (argType == 2)
-			{
-				int number = -1;
-				if (std::holds_alternative<int>(label))
-				{
-					number = std::get<int>(label);
-				}
-				if (number == -1)
-				{
-					std::cerr << "Exit code not provided!";
-					exit(EXIT_FAILURE);
-				}
-				m_output << "   mov rax, 60\n";
-				m_output << "	mov rdx, " << number << "\n";
-				m_output << "   syscall\n";
-				return std::move(m_output);
-			}
-			// Clear read buffer
-			if (argType == 3)
-			{
-				m_output << "   mov edi, input_buffer\n";
-				m_output << "	xor al, al";
-				m_output << "	mov ecx, 128\n";
-				m_output << "	rep stosb\n";
-				return std::move(m_output);
-			}
-			std::cerr << "[Argument error] Invalid argument type!";
-			exit(EXIT_FAILURE);
-		}
-
-		std::string create_label()
-		{
-			std::stringstream ss;
-			ss << "label" << m_label_count++;
-			return ss.str();
-		}
+		std::string create_label();
 
 		struct Var {
 			std::string name;

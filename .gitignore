@@ -46,3 +46,16 @@
 #VSCode folder
 ./vscode
 ./.vs
+
+#Cmake files
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+#Cache
+.cache
+CMakeFiles/
+
+#Executable
+Oxygen

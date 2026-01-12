@@ -4,7 +4,7 @@
 
 // #include "../helpers/Generation.hpp"
 
-int main(const int argc, char* argv[])
+int main(const int argc, char *argv[])
 {
 	static bool KeepOutFile;
 	static std::string OutputFile;
@@ -61,7 +61,7 @@ int main(const int argc, char* argv[])
 						break;
 					}
 				}
-				catch (const std::exception& e)
+				catch (const std::exception &e)
 				{
 					std::cout << "i++ > argc\n";
 					std::cout << "No output name specified. using default name (a.out)\n";
@@ -75,10 +75,12 @@ int main(const int argc, char* argv[])
 				}
 				if (argv[i] == std::string("-h") || argv[i] == std::string("--help"))
 				{
-					std::cout << "-h or --help:\n\t"
-					"This\n-d, -D, or --debug:\n\tEnables debug text and writing of a log of all debug text\n"
-					"-o, --o-keep, or --out-keep:\n\tKeeps the out (assembly) file for you fellow autists\n"
-					"-o-name:\n\tOverrides the out files name (default: a)\n";
+					std::cout
+							<< "-h or --help:\n\t"
+							   "This\n-d, -D, or --debug:\n\tEnables debug text and writing of a log of all debug "
+							   "text\n"
+							   "-o, --o-keep, or --out-keep:\n\tKeeps the out (assembly) file for you fellow autists\n"
+							   "-o-name:\n\tOverrides the out files name (default: a)\n";
 					exit(0);
 				}
 			}
@@ -97,6 +99,5 @@ int main(const int argc, char* argv[])
 			std::cerr << "Exited with exit code: 5\n";
 			exit(5);
 		}
-
 	}
 }
