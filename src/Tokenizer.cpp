@@ -38,13 +38,18 @@ std::string Tokenizer::to_string(const TokenType type)
 			return "property";
 		case TokenType::keyword_function:
 			return "function";
+		case TokenType::symbol_const:
+			return "const";
+		case TokenType::symbol_let:
+			return "let";
 		case TokenType::symbol_open_paren:
 			return "(";
 		case TokenType::symbol_close_paren:
 			return ")";
-			// TODO add functions
-			//  case TokenType::symbol_open_brace: return "{";
-			//  case TokenType::symbol_closed_brace: return "}"; For Functions later on
+		case TokenType::symbol_open_brace:
+			return "{";
+		case TokenType::symbol_closed_brace:
+			return "}";
 		case TokenType::symbol_equals:
 			return "=";
 		case TokenType::symbol_plus:
@@ -112,6 +117,14 @@ std::vector<Token> Tokenizer::tokenize()
 			}
 			else if (buffer == "function") {
 				tokens.push_back({TokenType::keyword_function, line_counter});
+				buffer.clear();
+			}
+			else if (buffer == "const") {
+				tokens.push_back({TokenType::keyword_const, line_counter});
+				buffer.clear();
+			}
+			else if (buffer == "let") {
+				tokens.push_back({TokenType::keyword_let, line_counter});
 				buffer.clear();
 			}
 			else if (buffer == "int")

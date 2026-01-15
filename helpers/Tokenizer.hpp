@@ -21,6 +21,8 @@ enum class TokenType
 	keyword_dynamic,
 	keyword_property,
 	keyword_function,
+	keyword_const,
+	keyword_let,
 	symbol_open_paren,
 	symbol_close_paren,
 	symbol_open_brace,
