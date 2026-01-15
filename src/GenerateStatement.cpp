@@ -35,8 +35,8 @@ void Generator::gen_stmt(const NodeStmt *stmt)
 
       void operator()(const NodeStmtIf *stmt)
       {
-        generator.m_output << "    push rax";
-        generator.gen_stmt(stmt->expr);
+        generator.m_output << "    push rax\n";
+        generator.gen_expr(stmt->expr);
         generator.m_output << "    cmp rax, 0\n";
         generator.m_output << "    je .if_true\n";
         if (stmt->_else) {
@@ -44,17 +44,21 @@ void Generator::gen_stmt(const NodeStmt *stmt)
         }
         generator.m_output << ".if_true:\n";
         generator.m_output << "    pop rax\n";
-        generator.gen_stmt(stmt->_then);
+        for (const NodeStmt *s: stmt->scope->_stmts) {
+          generator.gen_stmt(s);
+        }
         if (stmt->_else) {
           generator.m_output << ".else:\n";
           generator.m_output << "    pop rax\n";
-          generator.gen_stmt(*stmt->_else);
+          for (const NodeStmt *s: (*stmt->_else)->_stmts) {
+            generator.gen_stmt(s);
+          }
         }
       }
 
       void operator()(const NodeStmtAssign *stmt)
       {
-        // TODO add this
+        // TODO add this once variable assignment is added
       }
   };
 
